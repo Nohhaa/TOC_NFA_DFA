@@ -4,9 +4,7 @@ import java.util.*;
 public class AutomataSimulator {
     public static void main(String[] args) {
         String inputFile = "src\\input.txt";
-
         String outputFile = "src\\output.txt";
-
 
         try {
             List<String> results = processInput(inputFile);
@@ -65,11 +63,12 @@ public class AutomataSimulator {
 
     private static List<String> simulateDFA1(List<String> inputs) {
         // Problem 1: DFA that accepts strings not containing "ba"
+        DFA1 dfa = new DFA1();
         List<String> outputs = new ArrayList<>();
         outputs.add("1");
         for (String input : inputs) {
-            boolean containsBa = input.contains("ba");
-            outputs.add(containsBa ? "False" : "True");
+            boolean containsBa = dfa.accepts(input);
+            outputs.add(containsBa ? "True" : "False");
         }
         outputs.add("x");
         return outputs;
@@ -77,10 +76,11 @@ public class AutomataSimulator {
 
     private static List<String> simulateDFA2(List<String> inputs) {
         // Problem 2: DFA that accepts strings with an even number of 0's followed by a single 1
+        DFA2 dfa = new DFA2();
         List<String> outputs = new ArrayList<>();
         outputs.add("2");
         for (String input : inputs) {
-            boolean valid = input.matches("0*(10*)?");
+            boolean valid = dfa.accepts(input);
             outputs.add(valid ? "True" : "False");
         }
         outputs.add("x");
@@ -212,5 +212,97 @@ public class AutomataSimulator {
                 writer.newLine();
             }
         }
+    }
+    public static class DFA1 {
+        private enum State {
+            q0, q1
+        }
+
+        private State currentState;
+        private final Set<State> acceptingStates;
+        private final Map<State, Map<Character, State>> transitionFunction;
+
+        public DFA1() {
+            currentState = State.q0;
+
+            // Define accepting states
+            acceptingStates = new HashSet<>(Arrays.asList(State.q0, State.q1));
+
+            // Transition function
+            transitionFunction = new HashMap<>();
+            Map<Character, State> q0Transitions = new HashMap<>();
+            q0Transitions.put('a', State.q0);
+            q0Transitions.put('b', State.q1);
+
+            Map<Character, State> q1Transitions = new HashMap<>();
+            q1Transitions.put('b', State.q1);
+
+
+            transitionFunction.put(State.q0, q0Transitions);
+            transitionFunction.put(State.q1, q1Transitions);
+
+        }
+
+        public boolean accepts(String input) {
+            currentState = State.q0;  // Reset to start state for each new input
+            for (char c : input.toCharArray()) {
+                currentState = transitionFunction.get(currentState).get(c);
+            }
+            return acceptingStates.contains(currentState);
+        }
+
+
+    }
+    public static class DFA2 {
+        private enum State {
+            q0, q1,q2,q3,q4
+        }
+
+        private State currentState;
+        private final Set<State> acceptingStates;
+        private final Map<State, Map<Character, State>> transitionFunction;
+
+        public DFA2() {
+            currentState = State.q0;
+
+            // Define accepting states
+            acceptingStates = new HashSet<>(Arrays.asList(State.q3));
+
+            // Transition function
+            transitionFunction = new HashMap<>();
+            Map<Character, State> q0Transitions = new HashMap<>();
+            q0Transitions.put('1', State.q3);
+            q0Transitions.put('0', State.q1);
+
+            Map<Character, State> q1Transitions = new HashMap<>();
+            q1Transitions.put('0', State.q2);
+
+            Map<Character, State> q2Transitions = new HashMap<>();
+            q2Transitions.put('0', State.q4);
+            q2Transitions.put('1', State.q3);
+
+            //Map<Character, State> q3Transitions = new HashMap<>();
+
+            Map<Character, State> q4Transitions = new HashMap<>();
+            q4Transitions.put('0', State.q0);
+
+            transitionFunction.put(State.q0, q0Transitions);
+            transitionFunction.put(State.q1, q1Transitions);
+            transitionFunction.put(State.q2, q2Transitions);
+            transitionFunction.put(State.q3, q4Transitions);
+            transitionFunction.put(State.q4, q4Transitions);
+
+
+        }
+
+        public boolean accepts(String input) {
+            currentState = State.q0;  // Reset to start state for each new input
+            for (char c : input.toCharArray()) {
+                currentState = transitionFunction.get(currentState).get(c);
+            }
+            return acceptingStates.contains(currentState);
+        }
+
+
     }
 }
