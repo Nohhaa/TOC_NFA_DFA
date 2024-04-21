@@ -134,16 +134,27 @@ public class AutomataSimulator {
 
     private static List<String> simulateDFA4(List<String> inputs) {
         // Problem 4: DFA that accepts strings starting and ending with the same character
+        String[] stateNames = {"q0","q1","q2","q3","q4"};
+        String[][] transitions = {
+                {"q0", "a", "q1"},
+                {"q1", "a", "q3"},
+                {"q1", "b", "q1"},
+                {"q3", "b", "q1"},
+                {"q3", "a", "q3"},
+                {"q0", "b", "q2"},
+                {"q2", "b", "q4"},
+                {"q4", "b", "q4"},
+                {"q4", "a", "q2"},
+                {"q2", "a", "q2"}
+        };
+        String startStateName = "q0";
+        String[] acceptingStateNames = {"q3","q4"};
+        DFA dfa = new DFA(stateNames, transitions, startStateName, acceptingStateNames);
         List<String> outputs = new ArrayList<>();
         outputs.add("4");
         for (String input : inputs) {
-            if (input.length() > 0) {
-                char first = input.charAt(0);
-                char last = input.charAt(input.length() - 1);
-                outputs.add(first == last ? "True" : "False");
-            } else {
-                outputs.add("True");  // Empty string is considered valid
-            }
+            boolean valid = dfa.accepts(input);
+            outputs.add(valid ? "True" : "False");
         }
         outputs.add("x");
         return outputs;
@@ -151,15 +162,23 @@ public class AutomataSimulator {
 
     private static List<String> simulateDFA5(List<String> inputs) {
         // Problem 5: DFA that accepts binary integers divisible by 4
+        String[] stateNames = {"q0","q1","q2"};
+        String[][] transitions = {
+                {"q0", "0", "q0"},
+                {"q1", "1", "q1"},
+                {"q1", "0", "q2"},
+                {"q0", "1", "q1"},
+                {"q2", "1", "q1"},
+                {"q2", "0", "q0"}
+        };
+        String startStateName = "q0";
+        String[] acceptingStateNames = {"q0"};
+        DFA dfa = new DFA(stateNames, transitions, startStateName, acceptingStateNames);
         List<String> outputs = new ArrayList<>();
         outputs.add("5");
         for (String input : inputs) {
-            try {
-                int num = Integer.parseInt(input, 2);
-                outputs.add(num % 4 == 0 ? "True" : "False");
-            } catch (NumberFormatException e) {
-                outputs.add("False"); // Non-binary strings are invalid
-            }
+            boolean valid = dfa.accepts(input);
+            outputs.add(valid ? "True" : "False");
         }
         outputs.add("x");
         return outputs;
@@ -167,10 +186,27 @@ public class AutomataSimulator {
 
     private static List<String> simulateDFA6(List<String> inputs) {
         // Problem 6: DFA that accepts all strings except "11" and "111"
+        String[] stateNames = {"q0","q1","q2","q3","q4"};
+        String[][] transitions = {
+                {"q0", "0", "q1"},
+                {"q0", "1", "q2"},
+                {"q1", "1", "q1"},
+                {"q1", "0", "q1"},
+                {"q2", "1", "q3"},
+                {"q2", "0", "q1"},
+                {"q3", "1", "q4"},
+                {"q3", "0", "q1"},
+                {"q4", "1", "q1"},
+                {"q4", "0", "q1"}
+        };
+        String startStateName = "q0";
+        String[] acceptingStateNames = {"q1","q0"};
+        DFA dfa = new DFA(stateNames, transitions, startStateName, acceptingStateNames);
         List<String> outputs = new ArrayList<>();
         outputs.add("6");
         for (String input : inputs) {
-            outputs.add(!(input.equals("11") || input.equals("111")) ? "True" : "False");
+            boolean valid = dfa.accepts(input);
+            outputs.add(valid ? "True" : "False");
         }
         outputs.add("x");
         return outputs;
